@@ -14,11 +14,11 @@ export const GroupSchedule = observer(() => {
         <div className='col-3'>
           <NewPersonalSchedule />
         </div>
-        {groupSchedule.personalSchedules.map(schedule => (
+        {/* {groupSchedule.personalSchedules.map(schedule => (
           <div className='col-3' key={schedule.person.id}>
             <PersonalSchedule schedule={schedule} />
           </div>
-        ))}
+        ))} */}
       </div>
       <h1>Time together: {groupSchedule.timeTogether} hours</h1>
       <div className='row'>

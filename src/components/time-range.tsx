@@ -5,6 +5,8 @@ import { PersonModel, TimeRangeModel } from '../model'
 import { sharedMouseDragTracker } from '../utils/mouse-drag-tracker'
 
 class TimeRangeUi {
+  isDragging = false
+
   private readonly timeRange: TimeRangeModel
   private readonly person: PersonModel
   private originalStart = 0
@@ -19,6 +21,8 @@ class TimeRangeUi {
 
   onMouseDown = (event: ReactMouseEvent) => {
     this.originalStart = this.timeRange.start
+    this.isDragging = true
+
     sharedMouseDragTracker.startTracking(event)
     const dispose = observe(sharedMouseDragTracker, 'deltaX', change => {
       this.handleDeltaX(dispose, change)
@@ -28,6 +32,7 @@ class TimeRangeUi {
   private handleDeltaX = (dispose: Lambda, { newValue }: IValueDidChange<number | null>) => {
     if (newValue === null) {
       dispose()
+      this.isDragging = false
       return
     }
 
@@ -51,6 +56,10 @@ class TimeRangeUi {
 
     return Math.min(this.timeRange.duration, 24 - ((this.timeRange.start + 24 - this.person.hoursDelta) % 24))
   }
+
+  get end() {
+    return this.start + this.width
+  }
 }
 
 type Props = {
@@ -63,17 +72,14 @@ export const TimeRange = observer<Props>(({ timeRange, person, isTail }) => {
   const ui = useMemo(() => new TimeRangeUi(timeRange, person, isTail), [timeRange, person, isTail])
 
   return (
-    <div
-      className='rounded bg-danger'
-      style={{
-        position: 'absolute',
-        top: 24,
-        bottom: 8,
-        left: ui.start * 48,
-        width: ui.width * 48,
-        backgroundColor: 'red',
-      }}
-      onMouseDown={ui.onMouseDown}
-    />
+    <>
+      <div style={{ flex: ui.start / 24 }} />
+      <div
+        className='rounded bg-danger'
+        onMouseDown={ui.onMouseDown}
+        style={{ flex: ui.width / 24, marginTop: 2, marginBottom: 2, pointerEvents: 'auto', cursor: ui.isDragging ? 'grabbing' : 'grab' }}
+      />
+      <div style={{ flex: 1 - ui.end / 24 }} />
+    </>
   )
 })

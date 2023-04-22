@@ -1,6 +1,18 @@
 import { makeAutoObservable } from 'mobx'
 import moment from 'moment-timezone'
 
+export class TimeModel {
+  hours: number
+  minutes: number
+
+  constructor(hours: number, minutes: number) {
+    this.hours = hours
+    this.minutes = minutes
+
+    makeAutoObservable(this)
+  }
+}
+
 export class TimeRangeModel {
   start: number
   end: number
